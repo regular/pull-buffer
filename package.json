@@ -1,20 +1,36 @@
 {
-  "name": "pull-buffer",
+  "name": "pull-buffer-until",
   "version": "1.0.0",
-  "description": "",
+  "description": "group incoming items until either max item count is reached or no new items arrived for a while (like pull-group but with a timeout)",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node test.js"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/regular/pull-buffer.git"
   },
-  "keywords": [],
-  "author": "Jan Bölsche <jan@lagomorph.de> (https://regular.codes/)",
-  "license": "ISC",
+  "keywords": [
+    "pull-stream",
+    "buffer",
+    "group",
+    "timeout",
+    "batch"
+  ],
+  "contributors": [
+    "Jan Bölsche <jan@lagomorph.de> (http://regular.codes)",
+    "Matt Ross (https://github.com/amsross)"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "tape": "^4.2.0"
+  },
+  "dependencies": {
+    "pull-stream": "^2.28.4"
+  },
   "bugs": {
     "url": "https://github.com/regular/pull-buffer/issues"
   },
-  "homepage": "https://github.com/regular/pull-buffer#readme"
+  "homepage": "https://github.com/regular/pull-buffer#readme",
+  "author": "Jan Bölsche <jan@lagomorph.de> (https://regular.codes/)"
 }
