@@ -36,7 +36,7 @@ pull(
     [10, 19],
     [10, 20],
   ]),
-  bufferUntil(buffer => buffer.length => 3, {timeout: 40}),
+  bufferUntil(buffer => buffer.length == 3, {timeout: 40}),
   pull.log()
 )
 /* => 
