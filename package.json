@@ -1,6 +1,6 @@
 {
   "name": "pull-buffer-until",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "group incoming items until either max item count is reached or no new items arrived for a while (like pull-group but with a timeout)",
   "main": "index.js",
   "scripts": {
