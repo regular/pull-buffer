@@ -1,6 +1,6 @@
-var test = require('tape')
-var pull = require('pull-stream')
-var buffer = require('.')
+const test = require('tape')
+const pull = require('pull-stream')
+const buffer = require('.')
 
 function timedSource(data) {
   return pull(
@@ -8,7 +8,7 @@ function timedSource(data) {
     pull.asyncMap(function(item, cb) {
       setTimeout(function() {
         cb(null, item[1])
-      }, item[0]);
+      }, item[0])
     })
   )
 }
@@ -23,18 +23,18 @@ test('should buffer frequent updates', function(t) {
       [2000,4],
       [10,  5]
     ]),
-    buffer({timeout: 200, max: 1000}),
+    buffer({timeout: 200}),
     //pull.through(console.log.bind(console)),
     pull.collect(function(end, arr) {
       t.notOk(end)
       t.deepEqual(arr, [[0],[1,2],[3],[4,5]])
       //console.log(arr)
-      t.end();
+      t.end()
     })
   )
 })
 
-test('should not buffer more than max items', function(t) {
+test('should flush buffer when condition is met', function(t) {
   pull(
     timedSource([
       [10,  5],
@@ -51,13 +51,13 @@ test('should not buffer more than max items', function(t) {
       [10, 19],
       [10, 20],
     ]),
-    buffer({timeout: 40, max: 3}),
+    buffer(b => b.length == 3, {timeout: 40}),
     pull.collect((err, arr) => {
-      t.equal(err, null);
-      t.deepEqual(arr, [[5,6,7], [8,9,10], [11], [15,16,17], [18,19,20]]);
-      t.end();
+      t.equal(err, null)
+      t.deepEqual(arr, [[5,6,7], [8,9,10], [11], [15,16,17], [18,19,20]])
+      t.end()
     })
-  );
+  )
 })
 
 test('should pass through single item', function(t) {
@@ -71,7 +71,7 @@ test('should pass through single item', function(t) {
       t.notOk(end)
       t.deepEqual(arr, [[0]])
       //console.log(arr)
-      t.end();
+      t.end()
     })
   )
 })
@@ -101,7 +101,7 @@ test('should pass through late last item', function(t) {
   pull(
     timedSource([
       [0,   0],
-      [199, 1],
+      [100, 1],
       [2000,2]
     ]),
     buffer({timeout:200}),
@@ -110,7 +110,7 @@ test('should pass through late last item', function(t) {
       t.notOk(end)
       t.deepEqual(arr, [[0,1],[2]])
       //console.log(arr)
-      t.end();
+      t.end()
     })
   )
 })

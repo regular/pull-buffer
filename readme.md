@@ -1,14 +1,14 @@
 # pull-buffer-until
 [![NPM](https://nodei.co/npm/pull-buffer-until.png)](https://nodei.co/npm/pull-buffer-until/)
 
-Group incoming items until either a max item count is reached or no new items arrived for a while.
-like pull-group, but with a timeout, and like pull-debounce, but with collecting intermediate items.
+Group incoming items until either a condition is met or no new items arrived for a while. This is great for processing data in batches while still retaining realtime-ness. 
+Like pull-group, but with a timeout, and like pull-debounce, but with collecting intermediate items.
 
 ## Example
 
 ``` js
-var pull = require('pull-stream')
-var buffer = require('pull-buffer-unril')
+const pull = require('pull-stream')
+const bufferUntil = require('pull-buffer-unril')
 
 function timedSource(data) {
   return pull(
@@ -16,7 +16,7 @@ function timedSource(data) {
     pull.asyncMap(function(item, cb) {
       setTimeout(function() {
         cb(null, item[1])
-      }, item[0]);
+      }, item[0])
     })
   )
 }
@@ -36,7 +36,7 @@ pull(
     [10, 19],
     [10, 20],
   ]),
-  buffer({timeout: 40, max: 3}),
+  bufferUntil(buffer => buffer.length => 3, {timeout: 40}),
   pull.log()
 )
 /* => 
@@ -47,6 +47,14 @@ pull(
 [18,19,20]
 
 ```
+
+## API
+
+`bufferUntil([condition], [opts])`
+
+  - `condition` is called with the array of bufered items. If it returns a truthy value, the buffer is flushed (emitted downstream).
+  - `opts`
+    - `timeout`: If no new items arrive within the specified number of milliseconds, the buffer is flushed.
 
 ## License
 MIT
