@@ -38,7 +38,7 @@ module.exports = function buffer(cond, opts) {
           if (!buffer.length) return callback(end)
           let _buffer = buffer
           buffer = []
-          return callback(null, _buffer), _buffer = null
+          return callback(null, _buffer)
         }
         buffer.push(data)
         if (timeoutWon) {

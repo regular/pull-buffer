@@ -115,3 +115,14 @@ test('should pass through late last item', function(t) {
   )
 })
 
+
+test('end with buffer empty', t=>{
+  pull(
+    pull.values([1,2,3,4,5]),
+    buffer(b=>b[b.length-1] == 5),
+    pull.onEnd(err =>{
+      t.error(err)
+      t.end()
+    })
+  )
+})
