@@ -126,3 +126,58 @@ test('end with buffer empty', t=>{
     })
   )
 })
+
+test('error propagation: before (no timeout)', t=>{
+  pull(
+    pull.values([1,2,3,4,5]),
+    pull.asyncMap( (x, cb)=>{
+      return cb(new Error('x is 4!'))
+    }),
+    buffer(b=>b[b.length-1] == 5),
+    pull.onEnd(err =>{
+      t.equal(err.message, 'x is 4!')
+      t.end()
+    })
+  )
+})
+test('error propagation: after (no timeout)', t=>{
+  pull(
+    pull.values([1,2,3,4,5]),
+    buffer(b=>b[b.length-1] == 5),
+    pull.asyncMap( (x, cb)=>{
+      return cb(new Error('x is 4!'))
+    }),
+    pull.onEnd(err =>{
+      t.equal(err.message, 'x is 4!')
+      t.end()
+    })
+  )
+})
+
+test('error propagation: before (with timeout)', t=>{
+  pull(
+    pull.values([1,2,3,4]),
+    pull.asyncMap( (x, cb)=>{
+      return cb(new Error('x is 4!'))
+    }),
+    buffer(b=>b[b.length-1] == 5, {timeout: 1000}),
+    pull.onEnd(err =>{
+      t.equal(err.message, 'x is 4!')
+      t.end()
+    })
+  )
+})
+
+test('error propagation: after (with timeout)', t=>{
+  pull(
+    pull.values([1,2,3,4]),
+    buffer(b=>b[b.length-1] == 5, {timeout: 1000}),
+    pull.asyncMap( (x, cb)=>{
+      return cb(new Error('x is 4!'))
+    }),
+    pull.onEnd(err =>{
+      t.equal(err.message, 'x is 4!')
+      t.end()
+    })
+  )
+})
