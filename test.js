@@ -181,3 +181,42 @@ test('error propagation: after (with timeout)', t=>{
     })
   )
 })
+
+test('abort while waiting', t=>{
+  pull(
+    pull.values([1,2,3,4]),
+    buffer(()=>true, {timeout: 3000}),
+    pull.flatten(),
+    pull.asyncMap( (x, cb)=>{
+      if (x == 3) {
+        return cb(new Error('x is 3!'))
+      }
+      cb(null, x)
+    }),
+    pull.collect( (err, data) =>{
+      console.log(data)
+      t.equal(err.message, 'x is 3!')
+      t.end()
+    })
+  )
+})
+
+test('abort while reading', t=>{
+  let drain
+  pull(
+    pull.values([1,2,3,4]),
+    pull.asyncMap( (x, cb) =>{
+      if (x<=2) return cb(null, x)
+    }),
+    buffer(()=>false),
+    drain = pull.drain( x=>{
+      console.log('drain', x)
+    }, err =>{
+      t.equal(err.message, 'timeout')
+      t.end()
+    })
+  )
+  setTimeout( ()=>{
+    drain.abort(new Error('timeout'))
+  }, 1000)
+})

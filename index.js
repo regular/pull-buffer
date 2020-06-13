@@ -1,5 +1,5 @@
 'use strict';
-
+const debug = require('debug')('pull-buffer-until')
 const never = ()=>false
 
 module.exports = function buffer(cond, opts) {
@@ -17,28 +17,43 @@ module.exports = function buffer(cond, opts) {
   let buffer = []
 
   function callback(end, data) {
-    if (queue.length) queue.shift()(end, data)
+    if (queue.length) {
+      debug(`cb end=${end}, data=${data}`)
+      queue.shift()(end, data)
+    }
+  }
+
+  function flush(end) {
+    debug(`flush with ${buffer.length} items`)
+    if (!buffer.length) return callback(end)
+    let _buffer = buffer
+    buffer = []
+    debug('cb with incomplete buffer')
+    return callback(null, _buffer)
   }
 
   return function(read) {
-    var timeoutWon = false
+    let timeoutWon = false
     return function next (end, cb) {
-      if (cb) queue.push(cb)
-      if (ended) return callback(ended)
-      if (readPending) return
-      if (end) return read(end, callback)
+      debug(`read called with end=${end}`)
+      if (ended) return cb(ended)
       ended = ended || end
+      if (end) {
+        flush(end)
+        return read(end, cb)
+      }
+      if (cb) queue.push(cb)
+      if (readPending) return
 
       readPending = true
-      read(end, function (end, data) {
+      debug('reading ...')
+      read(null, function (end, data) {
+        debug(`got end=${end}, data=${data}`)
         readPending = false
         if (end) {
           // always emit last item
           ended = end
-          if (!buffer.length) return callback(end)
-          let _buffer = buffer
-          buffer = []
-          return callback(null, _buffer)
+          return flush(end)
         }
         buffer.push(data)
         if (timeoutWon) {
